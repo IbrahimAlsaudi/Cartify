@@ -32,13 +32,16 @@ class AuthViewModel @Inject constructor(
     }
 
     fun deleteAccount() {
-        val uid = authRepository.getCurrentUser()?.id
         viewModelScope.launch {
-            uid?.let {
-                firestoreSource.deleteUser(uid)
-                Log.d("UserId: ", uid)
-            }
             authRepository.deleteAccount()
         }
+//        val uid = authRepository.getCurrentUser()?.id
+//        viewModelScope.launch {
+//            uid?.let {
+//                firestoreSource.deleteUser(uid)
+//                Log.d("UserId: ", uid)
+//            }
+//            authRepository.deleteAccount()
+//        }
     }
 }

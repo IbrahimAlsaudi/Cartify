@@ -1,12 +1,17 @@
 package com.example.cartify.core.data.firebase
 
+import android.util.Log
 import androidx.credentials.CredentialManager
+import com.example.cartify.core.data.local.dao.CartDao
+import com.example.cartify.core.data.local.dao.WishlistDao
 import com.example.cartify.core.domain.model.User
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -15,7 +20,8 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class FirebaseAuthSource @Inject constructor(
-    private val firebaseAuth: FirebaseAuth
+    private val firebaseAuth: FirebaseAuth,
+    private val firestoreSource: FirestoreSource,
 ) {
     suspend fun signIn(email: String, password: String): Result<User> {
         return try {
@@ -77,36 +83,12 @@ class FirebaseAuthSource @Inject constructor(
             val currentUser = firebaseAuth.currentUser
                 ?: return Result.failure(Exception("No current user"))
 
-            // Link anonymous account with email credential
-            val result = currentUser.linkWithCredential(credential).await()
-            val firebaseUser = result.user
-                ?: return Result.failure(Exception("Link failed"))
-
-            // Set display name
-            val profileUpdate = UserProfileChangeRequest.Builder()
-                .setDisplayName(name)
-                .build()
-            firebaseUser.updateProfile(profileUpdate).await()
-
-            Result.success(firebaseUser.toDomain())
-        } catch (e: Exception) {
-            if(e is CancellationException) throw e
-            Result.failure(e)
-        }
-    }
-
-    suspend fun upgradeAnonymousAccountWithGoogle(idToken: String): Result<User> {
-        return try {
-            val credential = GoogleAuthProvider.getCredential(idToken, null)
-            val currentUser = firebaseAuth.currentUser
-                ?: return Result.failure(Exception("No current user"))
+            val anonymousUid = if (currentUser.isAnonymous) currentUser.uid else null
 
             val result = try {
                 currentUser.linkWithCredential(credential).await()
             } catch (e: Exception) {
-                if (e is com.google.firebase.auth.FirebaseAuthUserCollisionException) {
-                    // This Google account is already linked to another user.
-                    // Instead of failing, we sign in to that existing account.
+                if (e is FirebaseAuthUserCollisionException) {
                     firebaseAuth.signInWithCredential(credential).await()
                 } else {
                     throw e
@@ -116,12 +98,67 @@ class FirebaseAuthSource @Inject constructor(
             val firebaseUser = result.user
                 ?: return Result.failure(Exception("Link/Sign-in failed"))
 
+            if (anonymousUid != null && anonymousUid != firebaseUser.uid) {
+                try {
+                    firestoreSource.deleteUser(anonymousUid)
+                } catch (e: Exception) {
+                    Log.e("Delete Anonymous data failed: ", e.message, e)
+                }
+            }
+
+//            if (name.isNotBlank()) {
+//                val profileUpdate = UserProfileChangeRequest.Builder()
+//                    .setDisplayName(name)
+//                    .build()
+//                firebaseUser.updateProfile(profileUpdate).await()
+//            }
+
+            Result.success(firebaseUser.toDomain())
+        } catch (e: Exception) {
+            if (e is CancellationException) throw e
+            Result.failure(e)
+        }
+    }
+    suspend fun upgradeAnonymousAccountWithGoogle(idToken: String): Result<User> {
+        return try {
+            val credential = GoogleAuthProvider.getCredential(idToken, null)
+            val currentUser = firebaseAuth.currentUser
+                ?: return Result.failure(Exception("No current user"))
+
+            val anonymousUid = if(currentUser.isAnonymous) currentUser.uid else null
+
+            val result = try {
+                currentUser.linkWithCredential(credential).await()
+            } catch (e: Exception) {
+                if (e is FirebaseAuthUserCollisionException) {
+                    // This Google account is already linked to another user.
+                    // Instead of failing sign in to that existing account.
+                    firebaseAuth.signInWithCredential(credential).await()
+                } else {
+                    throw e
+                }
+            }
+
+            val firebaseUser = result.user
+                ?: return Result.failure(Exception("Link/Sign-in failed"))
+
+            if(anonymousUid != null && anonymousUid != firebaseUser.uid) {
+                try {
+                    firestoreSource.deleteUser(anonymousUid)
+                } catch (e: Exception) {
+                    /* atomicity problem, two separate systems, no shared transaction.
+                     The migration already succeeded but Firestore cleanup failed.*/
+                    Log.e("Delete Anonymous data failed: ", e.message, e)
+                }
+            }
+
             Result.success(firebaseUser.toDomain())
         } catch (e: Exception) {
             if(e is CancellationException) throw e
             Result.failure(e)
         }
     }
+
 
     fun isAnonymous(): Boolean = firebaseAuth.currentUser?.isAnonymous ?: false
 

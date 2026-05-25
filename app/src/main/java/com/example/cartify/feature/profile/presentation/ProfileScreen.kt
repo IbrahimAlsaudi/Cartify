@@ -31,12 +31,13 @@ fun ProfileScreen(
             .padding(24.dp),
         contentAlignment = Alignment.Center
     ) {
+
         val user = authState
         if (user != null && !user.isAnonymous) {
             AuthenticatedProfile(
                 user = user,
-                onLogout = { authViewModel.logout() },
-                onDeleteAccount = { authViewModel.deleteAccount() }
+                onLogout = authViewModel::logout,
+                onDeleteAccount = authViewModel::deleteAccount
             )
         } else {
             GuestProfile(

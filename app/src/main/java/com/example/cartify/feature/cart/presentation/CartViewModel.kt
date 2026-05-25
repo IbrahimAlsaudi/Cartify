@@ -50,15 +50,15 @@ class CartViewModel @Inject constructor(
             initialValue = CartUiState()
         )
 
-    init {
-        syncCart()
-    }
-
-    private fun syncCart() {
-        viewModelScope.launch {
-            cartRepository.syncCartFromFirestore()
-        }
-    }
+//    init {
+//        syncCart()
+//    }
+//
+//    private fun syncCart() {
+//        viewModelScope.launch {
+//            cartRepository.syncCartFromFirestore()
+//        }
+//    }
 
     fun increaseCount(productId: Int) {
         viewModelScope.launch {

@@ -2,6 +2,7 @@ package com.example.cartify.feature.auth.presentation.login
 
 import android.app.Activity
 import android.util.Log
+import androidx.compose.runtime.currentRecomposeScope
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cartify.core.util.GoogleSignInHelper
@@ -41,48 +42,54 @@ class LoginViewModel @Inject constructor(
 
     fun loginWithEmailAndPassword(email: String, password: String) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
+            try {
+                _uiState.update { it.copy(isLoading = true, error = null) }
 
-            val result = authRepository.signIn(email, password)
-            result.fold(
-                onSuccess = {
-//                    val isAnonymous = authRepository.isAnonymous()
-//                    val firebaseResult = if (isAnonymous) {
-//                        authRepository.upgradeAnonymousAccount(
-//                            email, password,
-//                            name = TODO(),
-//                        )
-//                    } else {
-//                        authRepository.signInWithGoogle(idToken)
-//                    }
-
-                    // Sync after successful login
-                    cartRepository.syncCartFromFirestore()
-                    wishlistRepository.syncWishlistFromFirestore()
-                    _uiState.update { it.copy(isLoading = false, isSuccess = true) }
-                },
-                onFailure = { e ->
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            error = when {
-                                it.email.isBlank() && it.password.isBlank() -> "Get out of my app right now"
-                                it.email.isBlank() -> "Email is Required"
-                                it.password.isBlank() -> "Really, No password ?"
-                                e.message?.contains("badly formatted.") == true -> "Do you know what does email means?"
-//                                !it.email.contains("@") -> "Wrong Email format"
-//                                e.message?.contains("empty") == true -> "All fields are required !"
-                                e.message?.contains("password") == true -> "Wrong password"
-                                e.message?.contains("no user") == true -> "No account found"
-                                e.message?.contains("network") == true -> "No internet connection"
-                                e.message?.contains("incorrect") == true -> "Incorrect Email or password"
-                                else -> "Login failed. Please try again"
-                            }
-                        )
-                    }
-                    Log.d("LoginViewModel", e.message ?: "Unknown")
+                val isAnonymous = authRepository.isAnonymous()
+                val result = if (isAnonymous) {
+                    authRepository.upgradeAnonymousAccount(email, password, "")
+                } else {
+                    authRepository.signIn(email, password)
                 }
-            )
+
+                result.fold(
+                    onSuccess = {
+                        viewModelScope.launch {
+                            if (isAnonymous) {
+                                // merge local data to new/existing account
+                                cartRepository.mergeLocalDataWithCloud()
+                                wishlistRepository.mergeLocalDataWithCloud()
+                            }
+                            // final sync to get combined data
+                            cartRepository.syncCartFromFirestore()
+                            wishlistRepository.syncWishlistFromFirestore()
+                            _uiState.update { it.copy(isLoading = false, isSuccess = true) }
+                        }
+                    },
+                    onFailure = { e ->
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                error = when {
+                                    it.email.isBlank() && it.password.isBlank() -> "Get out of my app right now"
+                                    it.email.isBlank() -> "Email is Required"
+                                    it.password.isBlank() -> "Really, No password ?"
+                                    e.message?.contains("badly formatted.") == true -> "Do you know what does email means?"
+                                    e.message?.contains("password") == true -> "Wrong password"
+                                    e.message?.contains("no user") == true -> "No account found"
+                                    e.message?.contains("network") == true -> "No internet connection"
+                                    e.message?.contains("incorrect") == true -> "Incorrect Email or password"
+                                    else -> "Login failed. Please try again"
+                                }
+                            )
+                        }
+                        Log.d("LoginViewModel", e.message ?: "Unknown")
+                    }
+                )
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isLoading = false, error = "An unexpected error occurred") }
+                Log.e("LoginViewModel", "Fatal error in loginWithEmailAndPassword", e)
+            }
         }
     }
 

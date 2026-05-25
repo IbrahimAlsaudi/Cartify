@@ -80,14 +80,14 @@ class WishlistViewModel @Inject constructor(
         }
     }
 
-    init {
-        syncWishlist()
-    }
-    private fun syncWishlist() {
-        viewModelScope.launch {
-            wishlistRepository.syncWishlistFromFirestore()
-        }
-    }
+//    init {
+//        syncWishlist()
+//    }
+//    private fun syncWishlist() {
+//        viewModelScope.launch {
+//            wishlistRepository.syncWishlistFromFirestore()
+//        }
+//    }
 }
 
 data class WishlistUiState(

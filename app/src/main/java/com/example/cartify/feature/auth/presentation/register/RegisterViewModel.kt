@@ -75,7 +75,7 @@ class RegisterViewModel @Inject constructor(
     fun signUp(name: String, email: String, password: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
-            
+
             val isAnonymous = authRepository.isAnonymous()
             val result = if (isAnonymous) {
                 authRepository.upgradeAnonymousAccount(email = email, password = password, name = name)
@@ -134,9 +134,11 @@ class RegisterViewModel @Inject constructor(
                             onSuccess = {
                                 viewModelScope.launch {
                                     if (isAnonymous) {
+                                        // Merge local data to new/existing account
                                         cartRepository.mergeLocalDataWithCloud()
                                         wishlistRepository.mergeLocalDataWithCloud()
                                     }
+                                    // Final sync to get combined data
                                     cartRepository.syncCartFromFirestore()
                                     wishlistRepository.syncWishlistFromFirestore()
                                     _uiState.update { it.copy(isLoading = false, isSuccess = true) }
@@ -144,8 +146,9 @@ class RegisterViewModel @Inject constructor(
                             },
                             onFailure = { e ->
                                 _uiState.update {
-                                    it.copy(isLoading = false, error = "Google sign in failed: ${e.message} ")
+                                    it.copy(isLoading = false, error = "Google sign in failed: ${e.message}")
                                 }
+                                Log.d("GoogleSignIn", e.localizedMessage, e)
                             }
                         )
                     },
@@ -172,7 +175,6 @@ class RegisterViewModel @Inject constructor(
             }
         }
     }
-
     fun clearError() {
         _uiState.update { it.copy(error = null) }
     }

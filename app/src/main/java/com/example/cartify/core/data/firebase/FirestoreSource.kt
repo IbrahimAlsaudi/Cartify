@@ -263,32 +263,37 @@ class FirestoreSource @Inject constructor(
 
     // ── Delete User ───────────────────────────────────────────────────────
 
-    suspend fun deleteUser(userId: String) {
-        val userRef = firestore.collection("users").document(userId)
+    suspend fun deleteUser(userId: String): Result<Unit> {
+        return try {
+            val userRef = firestore.collection("users").document(userId)
 
-        // Delete cart
-        val cartBatch = firestore.batch()
-        val cartDocs = userRef.collection("cart").get().await()
-        cartDocs.forEach { cartBatch.delete(it.reference) }
-        cartBatch.commit().await()
+            // Delete cart
+            val cartBatch = firestore.batch()
+            val cartDocs = userRef.collection("cart").get().await()
+            cartDocs.forEach { cartBatch.delete(it.reference) }
+            cartBatch.commit().await()
 
-        // Delete wishlist
-        val wishlistBatch = firestore.batch()
-        val wishlistDocs = userRef.collection("wishlist").get().await()
-        wishlistDocs.forEach { wishlistBatch.delete(it.reference) }
-        wishlistBatch.commit().await()
+            // Delete wishlist
+            val wishlistBatch = firestore.batch()
+            val wishlistDocs = userRef.collection("wishlist").get().await()
+            wishlistDocs.forEach { wishlistBatch.delete(it.reference) }
+            wishlistBatch.commit().await()
 
-        // Delete orders and their items
-        val orderDocs = userRef.collection("orders").get().await()
-        orderDocs.forEach { orderDoc ->
-            val itemsBatch = firestore.batch()
-            val itemDocs = orderDoc.reference.collection("items").get().await()
-            itemDocs.forEach { itemsBatch.delete(it.reference) }
-            itemsBatch.commit().await()
-            orderDoc.reference.delete().await()
+            // Delete orders and their items
+            val orderDocs = userRef.collection("orders").get().await()
+            orderDocs.forEach { orderDoc ->
+                val itemsBatch = firestore.batch()
+                val itemDocs = orderDoc.reference.collection("items").get().await()
+                itemDocs.forEach { itemsBatch.delete(it.reference) }
+                itemsBatch.commit().await()
+                orderDoc.reference.delete().await()
+            }
+
+            // Delete user document
+            userRef.delete().await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
-
-        // Delete user document
-        userRef.delete().await()
     }
 }

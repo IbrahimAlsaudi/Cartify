@@ -1,6 +1,7 @@
 package com.example.cartify.core.util
 
 import androidx.compose.ui.graphics.Color
+import com.example.cartify.BuildConfig
 import com.example.cartify.core.domain.model.Banner
 
 object Constants {
@@ -24,4 +25,6 @@ object Constants {
             imageUrl = "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800"
         )
     )
+
+    const val WEB_CLIENT_ID = BuildConfig.WEB_CLIENT_ID
 }

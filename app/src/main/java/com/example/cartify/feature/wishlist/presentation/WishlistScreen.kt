@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -41,7 +40,7 @@ import coil.compose.AsyncImage
 import com.example.cartify.R
 import com.example.cartify.core.domain.model.WishListItem
 import com.example.cartify.feature.home.presentation.home.ErrorMessage
-import com.example.cartify.feature.home.presentation.home.ShimmerProductCard
+import com.example.cartify.feature.home.presentation.components.ShimmerProductCard
 
 @Composable
 fun WishlistScreen(

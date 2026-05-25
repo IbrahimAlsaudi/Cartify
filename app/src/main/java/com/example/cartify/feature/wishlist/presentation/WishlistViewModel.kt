@@ -79,6 +79,15 @@ class WishlistViewModel @Inject constructor(
             cartRepository.addWishlistItemToCart(product)
         }
     }
+
+    init {
+        syncWishlist()
+    }
+    private fun syncWishlist() {
+        viewModelScope.launch {
+            wishlistRepository.syncWishlistFromFirestore()
+        }
+    }
 }
 
 data class WishlistUiState(

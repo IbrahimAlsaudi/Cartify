@@ -39,4 +39,7 @@ interface WishlistDao {
 
     @Query("DELETE FROM wishlist_items")
     suspend fun deleteAllWishlist()
+
+    @Query("SELECT * FROM wishlist_items")
+    suspend fun getAllWishlistItems(): List<WishlistItemEntity>
 }

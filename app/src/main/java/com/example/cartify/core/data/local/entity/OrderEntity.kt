@@ -9,5 +9,7 @@ data class OrderEntity(
     val userId: String,
     val totalPrice: Double,
     val status: String,
-    val createdAt: Long
+    val createdAt: Long,
+    val deliveryAddress: String,
+    val paymentMethod: String
 )

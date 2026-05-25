@@ -1,5 +1,7 @@
 package com.example.cartify.di
 
+import com.example.cartify.feature.auth.data.repository.AuthRepository
+import com.example.cartify.feature.auth.data.repository.AuthRepositoryImpl
 import com.example.cartify.feature.cart.data.repository.CartRepository
 import com.example.cartify.feature.cart.data.repository.CartRepositoryImpl
 import com.example.cartify.feature.home.data.repository.ProductRepository
@@ -32,4 +34,10 @@ abstract class RepositoryModule {
     abstract fun bindCartItemRepository(
         impl: CartRepositoryImpl
     ): CartRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAuthRepository(
+        impl: AuthRepositoryImpl
+    ): AuthRepository
 }

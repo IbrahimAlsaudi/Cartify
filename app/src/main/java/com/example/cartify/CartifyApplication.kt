@@ -17,4 +17,5 @@ class CartifyApplication: Application(), Configuration.Provider {
             .setWorkerFactory(workerFactory)
             .build()
 
+
 }

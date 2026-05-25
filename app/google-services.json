@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "141822884315",
+    "project_id": "cartify-6f6cb",
+    "storage_bucket": "cartify-6f6cb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:141822884315:android:12bde8ed8e1136ee010ffe",
+        "android_client_info": {
+          "package_name": "com.example.cartify"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "141822884315-k6nr7onhit3501ger0v4hm33afoq80a9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.cartify",
+            "certificate_hash": "0d63ab7ac30b8ed0e41282ee909aa71eb32d924b"
+          }
+        },
+        {
+          "client_id": "141822884315-ujc6jt7tjkg6gs21fc1o0g3gghbchb09.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDrMsIXAqxb1chiAGKVrbjkS3BmIvFakSI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "141822884315-ujc6jt7tjkg6gs21fc1o0g3gghbchb09.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

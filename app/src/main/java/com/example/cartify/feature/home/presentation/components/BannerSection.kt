@@ -1,4 +1,4 @@
-package com.example.cartify.feature.home.presentation.home
+package com.example.cartify.feature.home.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

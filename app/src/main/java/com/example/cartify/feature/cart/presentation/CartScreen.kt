@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -27,13 +28,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.cartify.core.domain.model.CartItem
 import com.example.cartify.feature.cart.presentation.components.CartItemCard
 import com.example.cartify.feature.home.presentation.home.ErrorMessage
 import java.util.Locale
 
 
 @Composable
-fun CartScreen(viewModel: CartViewModel, navigateToDetails: (Int) -> Unit, modifier: Modifier = Modifier) {
+fun CartScreen(
+    viewModel: CartViewModel,
+    navigateToDetails: (Int) -> Unit,
+    navigateToRegister:() -> Unit,
+    modifier: Modifier = Modifier
+) {
     val uiState by viewModel.uiState.collectAsState()
 
     Box(modifier = modifier.fillMaxSize()) {
@@ -72,10 +79,13 @@ fun CartScreen(viewModel: CartViewModel, navigateToDetails: (Int) -> Unit, modif
             else -> {
                 CartContent(
                     uiState = uiState,
-                    onIncrease = viewModel::increaseCount,
+                    onIncrease = viewModel::increaseCount ,
                     onDecrease = viewModel::decreaseCount,
                     onRemove = viewModel::deleteItem,
-                    onItemClick = { navigateToDetails(it.productId) }
+                    onItemClick = { navigateToDetails(it.productId) },
+                    onProceedClick = {
+                            viewModel.proceedToCheckout()
+                    }
                 )
             }
         }
@@ -88,7 +98,8 @@ fun CartContent(
     onIncrease: (Int) -> Unit,
     onDecrease: (Int) -> Unit,
     onRemove: (Int) -> Unit,
-    onItemClick: (com.example.cartify.core.domain.model.CartItem) -> Unit,
+    onItemClick: (CartItem) -> Unit,
+    onProceedClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier.fillMaxSize()) {
@@ -121,9 +132,9 @@ fun CartContent(
             items(uiState.products, key = { it.id }) { item ->
                 CartItemCard(
                     item = item,
-                    onIncrease = { onIncrease(item.id) },
-                    onDecrease = { onDecrease(item.id) },
-                    onRemove = { onRemove(item.id) },
+                    onIncrease = { onIncrease(item.productId) },
+                    onDecrease = { onDecrease(item.productId) },
+                    onRemove = { onRemove(item.productId) },
                     onClick = onItemClick
                 )
             }
@@ -158,7 +169,7 @@ fun CartContent(
                 }
                 Spacer(modifier = Modifier.height(24.dp))
                 Button(
-                    onClick = { /* Checkout logic */ },
+                    onClick = onProceedClick,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),

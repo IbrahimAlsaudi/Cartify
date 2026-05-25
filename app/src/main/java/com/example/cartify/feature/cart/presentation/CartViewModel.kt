@@ -1,8 +1,10 @@
 package com.example.cartify.feature.cart.presentation
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cartify.core.domain.model.CartItem
+import com.example.cartify.feature.auth.data.repository.AuthRepository
 import com.example.cartify.feature.cart.data.repository.CartRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -20,10 +22,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 @HiltViewModel
 class CartViewModel @Inject constructor(
-    private val cartRepository: CartRepository
+    private val cartRepository: CartRepository,
+    private val authRepository: AuthRepository
 ): ViewModel() {
-
-
 
     val uiState = cartRepository.getCartItems()
         .map { products ->
@@ -32,7 +33,8 @@ class CartViewModel @Inject constructor(
                 productCount = products.size,
                 total = products.sumOf { it.price * it.quantity },
                 isLoading = false,
-                error = null
+                error = null,
+                isAnonymous = authRepository.isAnonymous()
             )
         }.catch { throwable ->
             emit(
@@ -48,9 +50,19 @@ class CartViewModel @Inject constructor(
             initialValue = CartUiState()
         )
 
-    fun increaseCount(id: Int) {
+    init {
+        syncCart()
+    }
+
+    private fun syncCart() {
         viewModelScope.launch {
-            cartRepository.increaseQuantity(id)
+            cartRepository.syncCartFromFirestore()
+        }
+    }
+
+    fun increaseCount(productId: Int) {
+        viewModelScope.launch {
+            cartRepository.increaseQuantity(productId)
         }
     }
 
@@ -60,19 +72,25 @@ class CartViewModel @Inject constructor(
         }
     }
 
-
     fun deleteItem(id: Int) {
         viewModelScope.launch {
             cartRepository.removeFromCart(id)
         }
     }
-    
-}
 
+    fun proceedToCheckout() {
+        if (uiState.value.isAnonymous == true) {
+            Log.d("IsAnonymous", "true")
+        } else {
+            Log.d("IsAnonymous", "false")
+        }
+    }
+}
 data class CartUiState(
     val products: List<CartItem> = emptyList(),
     val productCount: Int = 0,
     val total: Double = 0.0,
     val isLoading: Boolean = true,
-    val error: String? = null
+    val error: String? = null,
+    val isAnonymous: Boolean? = null
 )

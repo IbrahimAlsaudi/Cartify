@@ -120,7 +120,7 @@ fun ProductDetailContent(
                     state = pagerState,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(350.dp)
+                        .height(450.dp)
                 ) { page ->
                     AsyncImage(
                         model = product.images[page],

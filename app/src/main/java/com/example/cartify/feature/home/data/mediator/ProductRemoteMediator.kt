@@ -11,13 +11,13 @@ import com.example.cartify.core.data.local.entity.ProductEntity
 import com.example.cartify.core.data.local.entity.RemoteKeyEntity
 import com.example.cartify.core.data.remote.api.CartifyApi
 import com.example.cartify.core.data.toEntity
-import com.example.cartify.core.util.Constants
 import java.io.IOException
 
 @OptIn(ExperimentalPagingApi::class)
 class ProductRemoteMediator(
     private val api: CartifyApi,
-    private val database: CartifyDatabase
+    private val database: CartifyDatabase,
+
 ): RemoteMediator<Int, ProductEntity>() {
     override suspend fun load(
         loadType: LoadType,
@@ -48,7 +48,11 @@ class ProductRemoteMediator(
             }
 
             val loadSize = if(loadType == LoadType.REFRESH) state.config.initialLoadSize else state.config.pageSize
-            val response = api.getProducts(limit = loadSize, skip = skip)
+            val response = api.getAllProducts(
+                limit = loadSize, skip = skip,
+                sortBy = null,
+                order = null
+            )
 
             val products = response.products
             val endOfPaginationReached = skip + products.size >= response.total

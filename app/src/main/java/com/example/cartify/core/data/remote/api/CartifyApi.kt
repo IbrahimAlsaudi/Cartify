@@ -9,17 +9,24 @@ import retrofit2.http.Query
 
 interface CartifyApi {
     @GET("products")
-    suspend fun getProducts(
+    suspend fun getAllProducts(
         @Query("limit") limit: Int,
-        @Query("skip") skip: Int
+        @Query("skip") skip: Int,
+        @Query("sortBy") sortBy: String?,
+        @Query("order") order: String?
     ): ProductResponseDto
+
 
     @GET("products/category/{category}")
     suspend fun getProductsByCategory(
         @Path("category") category: String,
         @Query("limit") limit: Int,
-        @Query("skip") skip: Int
+        @Query("skip") skip: Int,
+        @Query("sortBy") sortBy: String?,
+        @Query("order") order: String?
     ): ProductResponseDto
+
+
 
     @GET("products/categories")
     suspend fun getCategories(): List<CategoryDto>

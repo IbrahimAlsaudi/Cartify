@@ -176,7 +176,7 @@ fun CartContent(
                     shape = RoundedCornerShape(16.dp)
                 ) {
                     Text(
-                        text = "PROCEED TO CHECKOUT",
+                        text = "PAY NOW",
                         style = MaterialTheme.typography.titleMedium,
                     )
                 }

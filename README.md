@@ -9,7 +9,7 @@
 
 ---
 
-## ✨ Features
+##  Features
 
 - **Luxury UI/UX**: Crafted with Jetpack Compose and Material 3 for a fluid, elegant interface.
 - **Seamless Authentication**: Support for Email/Password, Google Sign-In, and Anonymous guest access.
@@ -29,7 +29,7 @@
 - **Image Loading**: [Coil](https://coil-kt.github.io/coil/)
 - **Asynchronous Flow**: Kotlin Coroutines & Flow
 
-## 🚀 Getting Started
+##  Getting Started
 
 1. **Clone the repository**:
    ```bash
@@ -44,12 +44,10 @@
 4. **Build and Run**:
    - Open in Android Studio and run on a device or emulator.
 
-## 🚧 Upcoming Tasks
+##  Upcoming Tasks
 - [ ] Order History and Tracking
 - [ ] Advanced Product Filtering
 - [ ] User Profile Customization
 - [ ] Payment Gateway Integration
 
 ---
-
-*Curated with ❤️ for the modern shopper.*

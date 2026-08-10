@@ -9,6 +9,8 @@
 
 ---
 
+<img width="300" height="700" alt="Screenshot_20260502_175949" src="https://github.com/user-attachments/assets/ab2e472e-b8dc-42f0-9640-a41b3ade0879" />
+
 ##  Features
 
 - **Luxury UI/UX**: Crafted with Jetpack Compose and Material 3 for a fluid, elegant interface.

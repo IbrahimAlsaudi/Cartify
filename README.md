@@ -66,7 +66,6 @@
 
 ##  Upcoming Tasks
 - [ ] Order History and Tracking
-- [ ] Advanced Product Filtering
 - [ ] User Profile Customization
 - [ ] Payment Gateway Integration
 

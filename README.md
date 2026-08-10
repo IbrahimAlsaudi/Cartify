@@ -9,7 +9,25 @@
 
 ---
 
-<img width="300" height="700" alt="Screenshot_20260502_175949" src="https://github.com/user-attachments/assets/ab2e472e-b8dc-42f0-9640-a41b3ade0879" />
+##  Screenshots
+
+<img width="300" height="700" alt="Screenshot_20260502_175949" src="https://github.com/IbrahimAlsaudi/Cartify/blob/63c2f98388c38e4af204eb6335944bfae5696f8e/Cartify_Screen_Shots/register.png" />
+
+<img width="300" height="700" alt="Screenshot_20260502_175949" src="https://github.com/IbrahimAlsaudi/Cartify/blob/63c2f98388c38e4af204eb6335944bfae5696f8e/Cartify_Screen_Shots/login.png" />
+
+<img width="300" height="700" alt="Screenshot_20260502_175949" src="https://github.com/IbrahimAlsaudi/Cartify/blob/63c2f98388c38e4af204eb6335944bfae5696f8e/Cartify_Screen_Shots/home_page.png" />
+
+<img width="300" height="700" alt="Screenshot_20260502_175949" src="https://github.com/IbrahimAlsaudi/Cartify/blob/63c2f98388c38e4af204eb6335944bfae5696f8e/Cartify_Screen_Shots/home_page_2.png" />
+
+<img width="300" height="700" alt="Screenshot_20260502_175949" src="https://github.com/IbrahimAlsaudi/Cartify/blob/63c2f98388c38e4af204eb6335944bfae5696f8e/Cartify_Screen_Shots/product_details.png" />
+
+<img width="300" height="700" alt="Screenshot_20260502_175949" src="https://github.com/IbrahimAlsaudi/Cartify/blob/63c2f98388c38e4af204eb6335944bfae5696f8e/Cartify_Screen_Shots/search.png" />
+
+<img width="300" height="700" alt="Screenshot_20260502_175949" src="https://github.com/IbrahimAlsaudi/Cartify/blob/63c2f98388c38e4af204eb6335944bfae5696f8e/Cartify_Screen_Shots/cart.png" />
+
+<img width="300" height="700" alt="Screenshot_20260502_175949" src="https://github.com/IbrahimAlsaudi/Cartify/blob/63c2f98388c38e4af204eb6335944bfae5696f8e/Cartify_Screen_Shots/wishlist.png" />
+
+<img width="300" height="700" alt="Screenshot_20260502_175949" src="https://github.com/IbrahimAlsaudi/Cartify/blob/63c2f98388c38e4af204eb6335944bfae5696f8e/Cartify_Screen_Shots/profile.png" />
 
 ##  Features
 

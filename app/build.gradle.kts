@@ -35,6 +35,9 @@ android {
             "WEB_CLIENT_ID",
             "\"${localProperties.getProperty("WEB_CLIENT_ID", "")}\""
         )
+        buildConfigField("String", "PAYMOB_SECRET_KEY", "\"${localProperties["PAYMOB_SECRET_KEY"]}\"")
+        buildConfigField("String", "PAYMOB_PUBLIC_KEY", "\"${localProperties["PAYMOB_PUBLIC_KEY"]}\"")
+        buildConfigField("String", "PAYMOB_INTEGRATION_ID", "\"${localProperties["PAYMOB_INTEGRATION_ID"]}\"")
     }
     buildFeatures {
         buildConfig = true  // ← enable BuildConfig
@@ -55,6 +58,7 @@ android {
     }
     buildFeatures {
         compose = true
+        dataBinding = true
     }
 }
 
@@ -119,6 +123,8 @@ dependencies {
     implementation("androidx.credentials:credentials:1.6.0")
     implementation("androidx.credentials:credentials-play-services-auth:1.6.0")
     implementation("com.google.android.libraries.identity.googleid:googleid:1.2.0")
+
+    implementation("com.paymob.sdk:Paymob-SDK:1.9.1")//Please change this version number to match the version number of the downloaded sdk
 
     // Testing
     testImplementation(libs.junit)

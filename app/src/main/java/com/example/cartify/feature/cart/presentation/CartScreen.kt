@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.cartify.core.domain.model.CartItem
 import com.example.cartify.feature.cart.presentation.components.CartItemCard
 import com.example.cartify.feature.home.presentation.home.ErrorMessage
@@ -41,7 +42,7 @@ fun CartScreen(
     navigateToRegister:() -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     Box(modifier = modifier.fillMaxSize()) {
         when {

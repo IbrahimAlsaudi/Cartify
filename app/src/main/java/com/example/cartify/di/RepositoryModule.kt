@@ -4,6 +4,8 @@ import com.example.cartify.feature.auth.data.repository.AuthRepository
 import com.example.cartify.feature.auth.data.repository.AuthRepositoryImpl
 import com.example.cartify.feature.cart.data.repository.CartRepository
 import com.example.cartify.feature.cart.data.repository.CartRepositoryImpl
+import com.example.cartify.feature.checkout.data.repository.PaymobRepository
+import com.example.cartify.feature.checkout.data.repository.PaymobRepositoryImpl
 import com.example.cartify.feature.home.data.repository.ProductRepository
 import com.example.cartify.feature.home.data.repository.ProductRepositoryImpl
 import com.example.cartify.feature.wishlist.data.repository.WishlistRepository
@@ -40,4 +42,10 @@ abstract class RepositoryModule {
     abstract fun bindAuthRepository(
         impl: AuthRepositoryImpl
     ): AuthRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindPaymobRepository(
+        impl: PaymobRepositoryImpl
+    ): PaymobRepository
 }

@@ -68,8 +68,6 @@ fun HomeScreen(
                         if (it.isLowerCase()) it.titlecase()
                         else it.toString()
                     },
-                onCartClick = { },
-                onNotificationClick = { }
             )
         }
         // --- BANNER SECTION ---
@@ -231,15 +229,12 @@ fun HomeScreen(
 
 @Composable
 fun HomeTopBar(
-    onCartClick: () -> Unit,
     userName: String,
-    onNotificationClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
+            .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column {
@@ -254,55 +249,9 @@ fun HomeTopBar(
                 color = MaterialTheme.colorScheme.onBackground
             )
         }
-        Row {
-            IconButton(onClick = onNotificationClick) {
-                Icon(
-//                    imageVector = Icons.Outlined.Notifications,
-                    painter = painterResource(R.drawable.outline_notifications_24),
-                    contentDescription = "Notifications"
-                )
-            }
-            IconButton(onClick = onCartClick) {
-                Icon(
-//                    imageVector = Icons.Outlined.ShoppingCart,
-                    painter = painterResource(R.drawable.outline_shopping_bag_24),
-                    contentDescription = "Cart"
-                )
-            }
-        }
     }
 }
 
-@Composable
-fun SearchBarButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        modifier = modifier.clickable { onClick() },
-        shape = RoundedCornerShape(12.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant,
-        tonalElevation = 2.dp
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Icon(
-//                imageVector = Icons.Outlined.Search,
-                painter = painterResource(R.drawable.outline_search_24),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Text(
-                text = "Search products...",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
-}
 
 @Composable
 fun ErrorMessage(

@@ -21,7 +21,6 @@ fun SortSection(
 ) {
     LazyRow(
         modifier = modifier,
-        contentPadding = PaddingValues(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(ProductSortOrder.entries) { sortOrder ->

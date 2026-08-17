@@ -8,4 +8,5 @@ data class IntentionBillingDataDto(
     @SerialName("first_name")   val firstName: String,
     @SerialName("last_name")    val lastName: String,
     @SerialName("email")        val email: String,
+    @SerialName("phone_number") val phoneNumber: String,
 )

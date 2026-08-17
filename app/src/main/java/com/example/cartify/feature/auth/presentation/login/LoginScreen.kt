@@ -57,7 +57,8 @@ fun LoginScreen(
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        contentWindowInsets = WindowInsets(0)
     ) { innerPadding ->
         Box(
             modifier = Modifier
@@ -83,7 +84,7 @@ fun LoginScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 20.dp),
+                        .padding(horizontal = 24.dp, vertical = 12.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -96,16 +97,16 @@ fun LoginScreen(
                             color = colorScheme.primary
                         )
                     )
-                    IconButton(onClick = { /* Handle Close */ }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.outline_close_small_24),
-                            contentDescription = "Close",
-                            tint = colorScheme.primary
-                        )
-                    }
+//                    IconButton(onClick = { /* Handle Close */ }) {
+//                        Icon(
+//                            painter = painterResource(id = R.drawable.outline_close_small_24),
+//                            contentDescription = "Close",
+//                            tint = colorScheme.primary
+//                        )
+//                    }
                 }
 
-                Spacer(modifier = Modifier.height(60.dp))
+                Spacer(modifier = Modifier.height(32.dp))
 
                 // Main Content
                 Column(
@@ -118,13 +119,13 @@ fun LoginScreen(
                         text = "Welcome Back",
                         style = MaterialTheme.typography.headlineLarge.copy(
                             fontFamily = PlayfairDisplay,
-                            fontSize = 32.sp,
+                            fontSize = 28.sp,
                             fontWeight = FontWeight.Normal,
                             color = colorScheme.onSurface
                         ),
                         textAlign = TextAlign.Center
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = "Enter your details to access your curated collection.",
                         style = MaterialTheme.typography.bodyMedium.copy(
@@ -134,7 +135,7 @@ fun LoginScreen(
                         textAlign = TextAlign.Center
                     )
 
-                    Spacer(modifier = Modifier.height(48.dp))
+                    Spacer(modifier = Modifier.height(32.dp))
 
                     // Email Input
                     Column(modifier = Modifier.fillMaxWidth()) {

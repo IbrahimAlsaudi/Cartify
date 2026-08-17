@@ -29,6 +29,7 @@ class PaymobRepositoryImpl @Inject constructor(
                 authorization = "Token ${BuildConfig.PAYMOB_SECRET_KEY}",
                 request = IntentionRequestDto(
                     amount = amountCents,
+                    currency = "EGP",
                     paymentMethods = listOf(BuildConfig.PAYMOB_INTEGRATION_ID.toInt()),
                     items = items,
                     billingData = billingData

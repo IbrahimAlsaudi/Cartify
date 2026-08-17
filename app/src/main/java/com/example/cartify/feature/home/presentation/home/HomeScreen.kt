@@ -45,7 +45,8 @@ import com.example.cartify.feature.home.presentation.components.SortSection
 @Composable
 fun HomeScreen(
     onProductClicked: (Int) -> Unit,
-    viewModel: HomeViewModel
+    viewModel: HomeViewModel,
+
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val products = viewModel.products.collectAsLazyPagingItems()

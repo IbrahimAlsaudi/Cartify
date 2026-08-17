@@ -108,7 +108,7 @@ class CartViewModel @Inject constructor(
                 firstName = user?.name?.split(" ")?.firstOrNull() ?: "NA",
                 lastName = user?.name?.split(" ")?.lastOrNull() ?: "NA",
                 email = user?.email ?: "NA",
-//                phoneNumber = "+201000000000" // until phone is added to profile
+                phoneNumber = "+201000000000" // until phone is added to profile
             )
 
             val amountCents = (currentState.total * 100).toInt()

@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class IntentionRequestDto(
     @SerialName("amount") val amount: Int,
-    @SerialName("currency") val currency: String = "EGP",
+    @SerialName("currency") val currency: String,
     @SerialName("payment_methods") val paymentMethods: List<Int>,
     @SerialName("items") val items: List<IntentionItemDto>,
     @SerialName("billing_data") val billingData: IntentionBillingDataDto

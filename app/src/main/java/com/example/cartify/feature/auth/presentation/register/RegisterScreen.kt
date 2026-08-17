@@ -7,6 +7,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -66,7 +67,8 @@ fun RegisterScreen(
     }
 
     Scaffold(
-        snackbarHost = {SnackbarHost(snackbarHostState)}
+        snackbarHost = {SnackbarHost(snackbarHostState)},
+        contentWindowInsets = WindowInsets(0)
     ) { innerPadding ->
         Box(
             modifier = Modifier
@@ -99,28 +101,36 @@ fun RegisterScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 24.dp)
+                        .padding(horizontal = 24.dp, vertical = 12.dp)
                 ) {
-                    IconButton(
-                        onClick = onNavigateBack,
-                        modifier = Modifier.align(Alignment.CenterStart)
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.outline_close_small_24),
-                            contentDescription = "Back",
-                            tint = colorScheme.primary
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically){
+                        Text(
+                            text = "CARTIFY",
+//                            modifier = Modifier.align(Alignment.Center),
+                            style = MaterialTheme.typography.headlineMedium.copy(
+                                fontFamily = PlayfairDisplay,
+                                letterSpacing = 4.sp,
+                                fontWeight = FontWeight.Light,
+                                color = colorScheme.primary
+                            )
                         )
+
+                        IconButton(
+                            onClick = onNavigateBack,
+//                        modifier = Modifier.align(Alignment.CenterStart)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.outline_close_small_24),
+                                contentDescription = "Back",
+                                tint = colorScheme.primary
+                            )
+                        }
+
                     }
-                    Text(
-                        text = "CARTIFY",
-                        modifier = Modifier.align(Alignment.Center),
-                        style = MaterialTheme.typography.headlineMedium.copy(
-                            fontFamily = PlayfairDisplay,
-                            letterSpacing = 4.sp,
-                            fontWeight = FontWeight.Light,
-                            color = colorScheme.primary
-                        )
-                    )
+
                 }
 
                 AnimatedVisibility(
@@ -131,7 +141,7 @@ fun RegisterScreen(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 24.dp, vertical = 48.dp),
+                            .padding(horizontal = 24.dp, vertical = 16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         // Headline Section
@@ -139,14 +149,14 @@ fun RegisterScreen(
                             text = "Join the Collection",
                             style = MaterialTheme.typography.headlineLarge.copy(
                                 fontFamily = PlayfairDisplay,
-                                fontSize = 32.sp,
+                                fontSize = 28.sp,
                                 fontStyle = FontStyle.Italic,
                                 fontWeight = FontWeight.Normal,
                                 color = colorScheme.onSurface
                             ),
                             textAlign = TextAlign.Center
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "Experience curated exclusivity and personalized elegance across every touchpoint.",
                             style = MaterialTheme.typography.bodyMedium.copy(
@@ -157,7 +167,7 @@ fun RegisterScreen(
                             textAlign = TextAlign.Center
                         )
 
-                        Spacer(modifier = Modifier.height(64.dp))
+                        Spacer(modifier = Modifier.height(32.dp))
 
                         // Registration Form
                         Column(

@@ -29,20 +29,62 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import com.example.cartify.BuildConfig
 import com.example.cartify.core.domain.model.CartItem
 import com.example.cartify.feature.cart.presentation.components.CartItemCard
 import com.example.cartify.feature.home.presentation.home.ErrorMessage
+import com.paymob.paymob_sdk.PaymobSdk
+import com.paymob.paymob_sdk.ui.PaymobSdkListener
 import java.util.Locale
-
 
 @Composable
 fun CartScreen(
     viewModel: CartViewModel,
     navigateToDetails: (Int) -> Unit,
-    navigateToRegister:() -> Unit,
+    navigateToRegister: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val paymentState by viewModel.paymentState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(paymentState) {
+        when (val state = paymentState) {
+            is PaymentState.ReadyToPay -> {
+                PaymobSdk.Builder(
+                    context = context,
+                    clientSecret = state.clientSecret,
+                    publicKey = BuildConfig.PAYMOB_PUBLIC_KEY,
+                    paymobSdkListener = object : PaymobSdkListener {
+                        override fun onSuccess(payResponse: HashMap<String, String?>) {
+                            viewModel.onPaymentSuccess()
+                        }
+
+                        override fun onFailure(msg: String?) {
+                            viewModel.onPaymentFailure()
+                        }
+
+                        override fun onPending() {
+                            // Optionally handle pending
+                        }
+                    }
+                ).build().start()
+                viewModel.resetPaymentState()
+            }
+
+            is PaymentState.Error -> {
+                snackbarHostState.showSnackbar(state.message)
+                viewModel.resetPaymentState()
+            }
+
+            else -> Unit
+        }
+    }
 
     Box(modifier = modifier.fillMaxSize()) {
         when {
@@ -84,10 +126,19 @@ fun CartScreen(
                     onDecrease = viewModel::decreaseCount,
                     onRemove = viewModel::deleteItem,
                     onItemClick = { navigateToDetails(it.productId) },
-                    onProceedClick = {
-                            viewModel.proceedToCheckout()
-                    }
+                    onProceedClick = viewModel::proceedToCheckout
                 )
+            }
+        }
+
+        if (paymentState is PaymentState.Loading) {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
             }
         }
     }

@@ -20,7 +20,11 @@
   <tr>
     <td><img width="200" src="https://github.com/IbrahimAlsaudi/Cartify/blob/63c2f98388c38e4af204eb6335944bfae5696f8e/Cartify_Screen_Shots/cart.png"/></td>
     <td><img width="200" src="https://github.com/IbrahimAlsaudi/Cartify/blob/63c2f98388c38e4af204eb6335944bfae5696f8e/Cartify_Screen_Shots/wishlist.png"/></td>
-    <td><img width="200" src="https://github.com/IbrahimAlsaudi/Cartify/blob/63c2f98388c38e4af204eb6335944bfae5696f8e/Cartify_Screen_Shots/profile.png"/></td>
+    <td><img width="200" src="https://github.com/IbrahimAlsaudi/Cartify/blob/4cac4fc448ab4b549bee022b92e29ee3d837fdb1/Cartify_Screen_Shots/profile.png"/></td>
+  </tr>
+  <tr>
+    <td><img width="200" src="https://github.com/IbrahimAlsaudi/Cartify/blob/4cac4fc448ab4b549bee022b92e29ee3d837fdb1/Cartify_Screen_Shots/order_history.png"/></td>
+    <td><img width="200" src="https://github.com/IbrahimAlsaudi/Cartify/blob/4cac4fc448ab4b549bee022b92e29ee3d837fdb1/Cartify_Screen_Shots/order_details.png"/></td>
   </tr>
 </table>
 

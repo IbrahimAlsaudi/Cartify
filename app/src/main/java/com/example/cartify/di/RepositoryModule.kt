@@ -8,6 +8,8 @@ import com.example.cartify.feature.checkout.data.repository.PaymobRepository
 import com.example.cartify.feature.checkout.data.repository.PaymobRepositoryImpl
 import com.example.cartify.feature.home.data.repository.ProductRepository
 import com.example.cartify.feature.home.data.repository.ProductRepositoryImpl
+import com.example.cartify.feature.orders.data.repository.OrderRepository
+import com.example.cartify.feature.orders.data.repository.OrderRepositoryImpl
 import com.example.cartify.feature.wishlist.data.repository.WishlistRepository
 import com.example.cartify.feature.wishlist.data.repository.WishlistRepositoryImpl
 import dagger.Binds
@@ -48,4 +50,10 @@ abstract class RepositoryModule {
     abstract fun bindPaymobRepository(
         impl: PaymobRepositoryImpl
     ): PaymobRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindOrderRepository(
+        impl: OrderRepositoryImpl
+    ): OrderRepository
 }

@@ -12,7 +12,9 @@ interface PaymobRepository {
         amountCents: Int,
         items: List<IntentionItemDto>,
         billingData: IntentionBillingDataDto
-    ): Result<String>
+    ): Result<Triple<String, Long, String>>
+
+    suspend fun getIntentionStatus(clientSecret: String): Result<Boolean>
 }
 
 class PaymobRepositoryImpl @Inject constructor(
@@ -23,7 +25,7 @@ class PaymobRepositoryImpl @Inject constructor(
         amountCents: Int,
         items: List<IntentionItemDto>,
         billingData: IntentionBillingDataDto
-    ): Result<String> {
+    ): Result<Triple<String, Long, String>> {
         return try {
             val response = paymobApi.createIntention(
                 authorization = "Token ${BuildConfig.PAYMOB_SECRET_KEY}",
@@ -35,7 +37,19 @@ class PaymobRepositoryImpl @Inject constructor(
                     billingData = billingData
                 )
             )
-            Result.success(response.clientSecret)
+            Result.success(Triple(response.clientSecret, response.intentionOrderId,response.id))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getIntentionStatus(clientSecret: String): Result<Boolean> {
+        return try {
+            val response = paymobApi.getIntentionStatus(
+                publicKey    = BuildConfig.PAYMOB_PUBLIC_KEY,
+                clientSecret = clientSecret
+            )
+            Result.success(response.confirmed)
         } catch (e: Exception) {
             Result.failure(e)
         }

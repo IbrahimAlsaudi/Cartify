@@ -17,6 +17,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -51,15 +53,14 @@ class SearchViewModel @Inject constructor(
     }
 
     fun searchProducts(query: String) {
+        if (query.isBlank()) return
+        
         viewModelScope.launch {
             productRepository.searchProduct(query).cachedIn(viewModelScope).collect {
                 _products.value = it
             }
-
         }
     }
-
-
 
     fun clearSearchQuery() {
         _searchQuery.value = ""
@@ -74,6 +75,5 @@ class SearchViewModel @Inject constructor(
 
 data class SearchUiState(
     val query: String = "",
-    val wishlistIds: Set<Int> = emptySet(),
-
+    val wishlistIds: Set<Int> = emptySet()
 )

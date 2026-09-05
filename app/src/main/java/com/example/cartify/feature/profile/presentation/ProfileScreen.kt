@@ -1,13 +1,18 @@
 package com.example.cartify.feature.profile.presentation
 
+
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -21,7 +26,8 @@ import com.example.cartify.ui.theme.HankenGrotesk
 fun ProfileScreen(
     modifier: Modifier = Modifier,
     authViewModel: AuthViewModel = hiltViewModel(),
-    onNavigateToLogin: () -> Unit = {}
+    onNavigateToLogin: () -> Unit = {},
+    onNavigateToOrders: () -> Unit = {}
 ) {
     val authState by authViewModel.authState.collectAsState()
 
@@ -31,18 +37,16 @@ fun ProfileScreen(
             .padding(24.dp),
         contentAlignment = Alignment.Center
     ) {
-
         val user = authState
         if (user != null && !user.isAnonymous) {
             AuthenticatedProfile(
                 user = user,
                 onLogout = authViewModel::logout,
-                onDeleteAccount = authViewModel::deleteAccount
+                onDeleteAccount = authViewModel::deleteAccount,
+                onNavigateToOrders = onNavigateToOrders
             )
         } else {
-            GuestProfile(
-                onNavigateToLogin = onNavigateToLogin
-            )
+            GuestProfile(onNavigateToLogin = onNavigateToLogin)
         }
     }
 }
@@ -51,26 +55,55 @@ fun ProfileScreen(
 fun AuthenticatedProfile(
     user: User,
     onLogout: () -> Unit,
-    onDeleteAccount: () -> Unit
+    onDeleteAccount: () -> Unit,
+    onNavigateToOrders: () -> Unit
 ) {
     val colorScheme = MaterialTheme.colorScheme
-    
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+
+        // ── Avatar initials circle ────────────────────────────────────────────
+        Box(
+            modifier = Modifier
+                .size(80.dp)
+                .background(
+                    color = colorScheme.primary.copy(alpha = 0.1f),
+                    shape = CircleShape
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = user.name
+                    .split(" ")
+                    .mapNotNull { it.firstOrNull()?.uppercaseChar() }
+                    .take(2)
+                    .joinToString(""),
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontFamily = HankenGrotesk,
+                    fontWeight = FontWeight.Bold,
+                    color = colorScheme.primary
+                )
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // ── Name ─────────────────────────────────────────────────────────────
         Text(
-            text = "PROFILE",
-            style = MaterialTheme.typography.labelLarge.copy(
+            text = user.name,
+            style = MaterialTheme.typography.titleLarge.copy(
                 fontFamily = HankenGrotesk,
                 fontWeight = FontWeight.Bold,
-                letterSpacing = 2.sp,
-                color = colorScheme.primary
+                color = colorScheme.onSurface
             )
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(4.dp))
 
+        // ── Email ─────────────────────────────────────────────────────────────
         Text(
             text = user.email,
             style = MaterialTheme.typography.bodyMedium.copy(
@@ -81,30 +114,29 @@ fun AuthenticatedProfile(
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        // Logout Button
-        Button(
+        // ── Action buttons ────────────────────────────────────────────────────
+
+        // My Orders
+        ProfileActionButton(
+            label = "MY ORDERS",
+            onClick = onNavigateToOrders,
+            containerColor = colorScheme.secondaryContainer,
+            contentColor = colorScheme.onSecondaryContainer
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Logout
+        ProfileActionButton(
+            label = "LOGOUT",
             onClick = onLogout,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = colorScheme.primary
-            ),
-            shape = RectangleShape
-        ) {
-            Text(
-                text = "LOGOUT",
-                style = MaterialTheme.typography.labelLarge.copy(
-                    fontFamily = HankenGrotesk,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 2.sp
-                )
-            )
-        }
+            containerColor = colorScheme.primary,
+            contentColor = colorScheme.onPrimary
+        )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
-        // Delete Account Button
+        // Delete Account
         OutlinedButton(
             onClick = onDeleteAccount,
             modifier = Modifier
@@ -115,7 +147,7 @@ fun AuthenticatedProfile(
             ),
             shape = RectangleShape,
             border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
-                brush = androidx.compose.ui.graphics.SolidColor(colorScheme.error.copy(alpha = 0.2f))
+                brush = SolidColor(colorScheme.error.copy(alpha = 0.2f))
             )
         ) {
             Text(
@@ -131,6 +163,35 @@ fun AuthenticatedProfile(
 }
 
 @Composable
+fun ProfileActionButton(
+    label: String,
+    onClick: () -> Unit,
+    containerColor: Color,
+    contentColor: Color
+) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = containerColor,
+            contentColor = contentColor
+        ),
+        shape = RectangleShape
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelLarge.copy(
+                fontFamily = HankenGrotesk,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 2.sp
+            )
+        )
+    }
+}
+
+@Composable
 fun GuestProfile(
     onNavigateToLogin: () -> Unit
 ) {
@@ -140,6 +201,22 @@ fun GuestProfile(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+
+        // ── Guest avatar ──────────────────────────────────────────────────────
+        Box(
+            modifier = Modifier
+                .size(80.dp)
+                .background(
+                    color = colorScheme.onSurface.copy(alpha = 0.06f),
+                    shape = CircleShape
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         Text(
             text = "GUEST MODE",
             style = MaterialTheme.typography.labelLarge.copy(
@@ -149,7 +226,9 @@ fun GuestProfile(
                 color = colorScheme.onSurface.copy(alpha = 0.4f)
             )
         )
+
         Spacer(modifier = Modifier.height(16.dp))
+
         Text(
             text = "Log in to manage your account and view order history.",
             style = MaterialTheme.typography.bodyMedium.copy(
@@ -158,7 +237,9 @@ fun GuestProfile(
             ),
             textAlign = TextAlign.Center
         )
+
         Spacer(modifier = Modifier.height(32.dp))
+
         Button(
             onClick = onNavigateToLogin,
             modifier = Modifier
@@ -166,6 +247,7 @@ fun GuestProfile(
                 .height(56.dp),
             shape = RectangleShape
         ) {
+
             Text(
                 text = "SIGN IN",
                 style = MaterialTheme.typography.labelLarge.copy(

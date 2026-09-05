@@ -4,6 +4,7 @@ import com.example.cartify.core.data.local.entity.CartItemEntity
 import com.example.cartify.core.data.local.entity.OrderEntity
 import com.example.cartify.core.data.local.entity.OrderItemEntity
 import com.example.cartify.core.data.local.entity.WishlistItemEntity
+import com.example.cartify.core.domain.model.Order
 import com.example.cartify.core.domain.model.User
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -167,32 +168,44 @@ class FirestoreSource @Inject constructor(
 
     // ── Orders ────────────────────────────────────────────────────────────
 
+
     suspend fun createOrder(userId: String, order: OrderEntity, items: List<OrderItemEntity>) {
         val orderRef = firestore.collection("users")
             .document(userId)
             .collection("orders")
             .document(order.id)
 
+        val cartRef = firestore.collection("users")
+            .document(userId)
+            .collection("cart")
+
         val batch = firestore.batch()
 
         batch.set(orderRef, mapOf(
-            "id" to order.id,
-            "totalPrice" to order.totalPrice,
-            "status" to order.status,
-            "createdAt" to order.createdAt,
-            "deliveryAddress" to order.deliveryAddress,
-            "paymentMethod" to order.paymentMethod
+            "id"             to order.id,
+            "totalPrice"     to order.totalPrice,
+            "status"         to order.status,
+            "createdAt"      to order.createdAt,
+//            "deliveryAddress" to order.deliveryAddress,
+            "paymentMethod"  to order.paymentMethod,
+            "paymobOrderId"  to order.paymobOrderId
         ))
 
         items.forEach { item ->
             val itemRef = orderRef.collection("items").document()
             batch.set(itemRef, mapOf(
                 "productId" to item.productId,
-                "title" to item.title,
-                "price" to item.price,
+                "title"     to item.title,
+                "price"     to item.price,
                 "thumbnail" to item.thumbnail,
-                "quantity" to item.quantity
+                "quantity"  to item.quantity
             ))
+        }
+
+        // clear cart in the same batch — either everything succeeds or nothing does
+        val cartDocs = cartRef.get().await()
+        cartDocs.forEach { doc ->
+            batch.delete(doc.reference)
         }
 
         batch.commit().await()
@@ -220,8 +233,9 @@ class FirestoreSource @Inject constructor(
                 totalPrice = doc.getDouble("totalPrice") ?: 0.0,
                 status = doc.getString("status") ?: "PENDING",
                 createdAt = doc.getLong("createdAt") ?: 0L,
-                deliveryAddress = doc.getString("deliveryAddress") ?: "",
-                paymentMethod = doc.getString("paymentMethod") ?: ""
+//                deliveryAddress = doc.getString("deliveryAddress") ?: "",
+                paymentMethod = doc.getString("paymentMethod") ?: "",
+                paymobOrderId = doc.getLong("paymobOrderId") ?: 0L
             )
         }
     }

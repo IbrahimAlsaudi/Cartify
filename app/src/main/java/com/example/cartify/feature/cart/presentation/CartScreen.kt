@@ -1,5 +1,6 @@
 package com.example.cartify.feature.cart.presentation
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -62,23 +63,40 @@ fun CartScreen(
                     publicKey = BuildConfig.PAYMOB_PUBLIC_KEY,
                     paymobSdkListener = object : PaymobSdkListener {
                         override fun onSuccess(payResponse: HashMap<String, String?>) {
-                            viewModel.onPaymentSuccess()
+                            Log.d("Paymob", "onSuccess called")
+                            Log.d("Paymob", "payResponse: $payResponse")
+                            val isSuccess = payResponse["success"]?.toBoolean() ?: false
+                            if (isSuccess) {
+                                viewModel.onPaymentSuccess()
+                            } else {
+                                viewModel.onPaymentFailure()
+                            }
                         }
 
                         override fun onFailure(msg: String?) {
-                            viewModel.onPaymentFailure()
+                            Log.d("Paymob", "onFailure called: $msg")
+                            if (msg == null) {
+                                viewModel.checkIntentionAndSave()  // query Paymob to confirm
+                            } else {
+                                viewModel.onPaymentFailure()
+                            }
                         }
 
                         override fun onPending() {
                             // Optionally handle pending
+                            Log.d("Paymob", "onPending called")
                         }
                     }
                 ).build().start()
-                viewModel.resetPaymentState()
             }
 
             is PaymentState.Error -> {
                 snackbarHostState.showSnackbar(state.message)
+                viewModel.resetPaymentState()
+            }
+
+            is PaymentState.Success -> {
+                snackbarHostState.showSnackbar("Order placed successfully!")
                 viewModel.resetPaymentState()
             }
 

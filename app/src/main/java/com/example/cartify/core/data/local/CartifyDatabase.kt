@@ -25,7 +25,7 @@ import com.example.cartify.core.data.local.entity.WishlistItemEntity
         RemoteKeyEntity::class,
         WishlistItemEntity::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

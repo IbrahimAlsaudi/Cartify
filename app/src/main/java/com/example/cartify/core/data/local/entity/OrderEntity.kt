@@ -3,6 +3,16 @@ package com.example.cartify.core.data.local.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+//@Entity(tableName = "orders")
+//data class OrderEntity(
+//    @PrimaryKey val id: String,
+//    val userId: String,
+//    val totalPrice: Double,
+//    val status: String,
+//    val createdAt: Long,
+//    val deliveryAddress: String,
+//    val paymentMethod: String
+//)
 @Entity(tableName = "orders")
 data class OrderEntity(
     @PrimaryKey val id: String,
@@ -10,6 +20,6 @@ data class OrderEntity(
     val totalPrice: Double,
     val status: String,
     val createdAt: Long,
-    val deliveryAddress: String,
-    val paymentMethod: String
+    val paymentMethod: String,
+    val paymobOrderId: Long,      // ← add this
 )

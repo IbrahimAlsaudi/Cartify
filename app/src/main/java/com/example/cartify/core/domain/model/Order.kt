@@ -6,6 +6,8 @@ data class Order(
     val totalPrice: Double,
     val status: OrderStatus,
     val createdAt: Long,
+    val paymobOrderId: Long,
+    val paymentMethod: String,
     val items: List<OrderItem>
 )
 

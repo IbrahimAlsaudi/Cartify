@@ -27,6 +27,7 @@ import com.example.cartify.feature.home.presentation.home.HomeViewModel
 import com.example.cartify.feature.profile.presentation.OrderDetailViewModel
 import com.example.cartify.feature.profile.presentation.OrderDetailsScreen
 import com.example.cartify.feature.profile.presentation.OrderHistoryScreen
+import com.example.cartify.feature.profile.presentation.OrderHistoryViewModel
 import com.example.cartify.feature.profile.presentation.ProfileScreen
 import com.example.cartify.feature.search.presentation.SearchScreen
 import com.example.cartify.feature.search.presentation.SearchViewModel
@@ -209,16 +210,28 @@ fun RootNavHost(
                            /* {
                                 popUpTo(Graph.Main) { inclusive = true }
                             }*/
+                        },
+                        onNavigateToOrders = {
+                            rootNavController.navigate(Screen.OrderHistoryScreen)
                         }
                     )
                 }
                 composable<Screen.OrderDetailScreen> {
                     val viewModel: OrderDetailViewModel = hiltViewModel()
-                    OrderDetailsScreen(viewModel = viewModel)
+                    OrderDetailsScreen(
+                        viewModel = viewModel,
+                        onNavigateBack = { rootNavController.popBackStack() }
+                    )
                 }
                 composable<Screen.OrderHistoryScreen> {
-
-                    OrderHistoryScreen()
+                    val viewModel: OrderHistoryViewModel = hiltViewModel()
+                    OrderHistoryScreen(
+                        viewModel = viewModel,
+                        onNavigateBack = { rootNavController.popBackStack() },
+                        onNavigateToOrderDetail = { id ->
+                            rootNavController.navigate(Screen.OrderDetailScreen(id))
+                        }
+                    )
                 }
 
             }

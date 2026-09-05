@@ -30,6 +30,9 @@ interface OrderDao {
     @Query("SELECT * FROM orders WHERE id = :orderId")
     suspend fun getOrderById(orderId: String): OrderEntity
 
+    @Query("SELECT * FROM orders WHERE id = :orderId")
+    fun getOrderByIdFlow(orderId: String): Flow<OrderEntity?>
+
     @Query("""
         SELECT * FROM orders
         WHERE id 

@@ -5,11 +5,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cartify.core.data.remote.dto.paymob.IntentionBillingDataDto
 import com.example.cartify.core.data.remote.dto.paymob.IntentionItemDto
+import com.example.cartify.core.data.toOrderItem
 import com.example.cartify.core.domain.model.CartItem
+import com.example.cartify.core.domain.model.Order
+import com.example.cartify.core.domain.model.OrderStatus
 import com.example.cartify.feature.auth.data.repository.AuthRepository
 import com.example.cartify.feature.cart.data.repository.CartRepository
 import com.example.cartify.feature.checkout.data.repository.PaymobRepository
+import com.example.cartify.feature.orders.data.repository.OrderRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import java.util.UUID
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,7 +35,8 @@ import javax.inject.Inject
 class CartViewModel @Inject constructor(
     private val cartRepository: CartRepository,
     private val authRepository: AuthRepository,
-    private val paymobRepository: PaymobRepository
+    private val paymobRepository: PaymobRepository,
+    private val orderRepository: OrderRepository
 ) : ViewModel() {
 
     val uiState = cartRepository.getCartItems()
@@ -44,12 +50,7 @@ class CartViewModel @Inject constructor(
                 isAnonymous = authRepository.isAnonymous()
             )
         }.catch { throwable ->
-            emit(
-                CartUiState(
-                    isLoading = false,
-                    error = throwable.message
-                )
-            )
+            emit(CartUiState(isLoading = false, error = throwable.message))
         }
         .stateIn(
             scope = viewModelScope,
@@ -60,22 +61,20 @@ class CartViewModel @Inject constructor(
     private val _paymentState = MutableStateFlow<PaymentState>(PaymentState.Idle)
     val paymentState: StateFlow<PaymentState> = _paymentState.asStateFlow()
 
+    // store paymobOrderId when intention is created
+    private var paymobOrderId: Long = 0L
+    private var intentionId: String = ""
+    private var clientSecret: String = ""
     fun increaseCount(productId: Int) {
-        viewModelScope.launch {
-            cartRepository.increaseQuantity(productId)
-        }
+        viewModelScope.launch { cartRepository.increaseQuantity(productId) }
     }
 
     fun decreaseCount(id: Int) {
-        viewModelScope.launch {
-            cartRepository.decreaseQuantity(id)
-        }
+        viewModelScope.launch { cartRepository.decreaseQuantity(id) }
     }
 
     fun deleteItem(id: Int) {
-        viewModelScope.launch {
-            cartRepository.removeFromCart(id)
-        }
+        viewModelScope.launch { cartRepository.removeFromCart(id) }
     }
 
     fun proceedToCheckout() {
@@ -100,25 +99,27 @@ class CartViewModel @Inject constructor(
                 IntentionItemDto(
                     name = cartItem.title,
                     amountCents = (cartItem.price * cartItem.quantity * 100).toInt(),
-//                    quantity = cartItem.quantity
                 )
             }
 
-            val billingData = IntentionBillingDataDto(
-                firstName = user?.name?.split(" ")?.firstOrNull() ?: "NA",
-                lastName = user?.name?.split(" ")?.lastOrNull() ?: "NA",
-                email = user?.email ?: "NA",
-                phoneNumber = "+201000000000" // until phone is added to profile
-            )
+            val amountCents = items.sumOf { it.amountCents }
 
-            val amountCents = (currentState.total * 100).toInt()
+            val billingData = IntentionBillingDataDto(
+                firstName   = user?.name?.split(" ")?.firstOrNull() ?: "NA",
+                lastName    = user?.name?.split(" ")?.lastOrNull() ?: "NA",
+                email       = user?.email ?: "NA",
+                phoneNumber = "+201000000000"
+            )
 
             paymobRepository.createIntention(
                 amountCents = amountCents,
                 items = items,
                 billingData = billingData
             ).fold(
-                onSuccess = { clientSecret ->
+                onSuccess = { (secret, intentionOrderId, id) ->
+                    paymobOrderId = intentionOrderId
+                    intentionId = id
+                    clientSecret = secret
                     _paymentState.value = PaymentState.ReadyToPay(clientSecret)
                 },
                 onFailure = { e ->
@@ -128,9 +129,61 @@ class CartViewModel @Inject constructor(
         }
     }
 
+    fun checkIntentionAndSave() {
+        viewModelScope.launch {
+            paymobRepository.getIntentionStatus(clientSecret).fold(
+                onSuccess = { confirmed ->
+                    Log.d("Paymob", "confirmed: $confirmed")
+                    if (confirmed) {
+                        onPaymentSuccess()
+                    } else {
+                        resetPaymentState()
+                    }
+                },
+                onFailure = {
+                    Log.d("Paymob", "status check failed: ${it.message}")
+                    resetPaymentState()
+                }
+            )
+        }
+    }
+
     fun onPaymentSuccess() {
-        // order creation goes here next
-        _paymentState.value = PaymentState.Idle
+        Log.d("Paymob",  "onPaymentSuccess called in viewModel")
+        viewModelScope.launch {
+            Log.d("Paymob", "coroutine launched")
+            val user = authRepository.getCurrentUser() ?: run {
+                _paymentState.value = PaymentState.Error("User not found.")
+                return@launch
+            }
+            Log.d("Paymob", "user: $user")
+
+            val orderId = UUID.randomUUID().toString()
+
+            val order = Order(
+                id            = orderId,
+                userId        = user.id,
+                totalPrice    = uiState.value.total,
+                status        = OrderStatus.PENDING,
+                createdAt     = System.currentTimeMillis(),
+                paymobOrderId = paymobOrderId,              // ← from stored value
+                paymentMethod = "Card",
+                items         = uiState.value.products.map { it.toOrderItem() }
+            )
+            Log.d("Paymob", "paymobOrderId: $paymobOrderId")
+            Log.d("Paymob", "cart products: ${uiState.value.products}")
+            orderRepository.addOrder(order).fold(
+                onSuccess = {
+                    Log.d("Paymob", "order saved successfully")
+                    paymobOrderId = 0L                      // ← reset
+                    _paymentState.value = PaymentState.Success(orderId)
+                },
+                onFailure = {
+                    Log.d("Paymob", "order failed: ${it.message}")
+                    _paymentState.value = PaymentState.Error("Order failed to save.")
+                }
+            )
+        }
     }
 
     fun onPaymentFailure() {
@@ -156,4 +209,5 @@ sealed interface PaymentState {
     data object Loading : PaymentState
     data class ReadyToPay(val clientSecret: String) : PaymentState
     data class Error(val message: String) : PaymentState
+    data class Success(val orderId: String) : PaymentState
 }

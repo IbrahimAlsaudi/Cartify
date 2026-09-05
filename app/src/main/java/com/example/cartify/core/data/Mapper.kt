@@ -1,12 +1,17 @@
 package com.example.cartify.core.data
 
 import com.example.cartify.core.data.local.entity.CartItemEntity
+import com.example.cartify.core.data.local.entity.OrderEntity
+import com.example.cartify.core.data.local.entity.OrderItemEntity
 import com.example.cartify.core.data.local.entity.ProductEntity
 import com.example.cartify.core.data.local.entity.WishlistItemEntity
 import com.example.cartify.core.data.remote.dto.CategoryDto
 import com.example.cartify.core.data.remote.dto.ProductDto
 import com.example.cartify.core.domain.model.CartItem
 import com.example.cartify.core.domain.model.Category
+import com.example.cartify.core.domain.model.Order
+import com.example.cartify.core.domain.model.OrderItem
+import com.example.cartify.core.domain.model.OrderStatus
 import com.example.cartify.core.domain.model.Product
 import com.example.cartify.core.domain.model.WishListItem
 import kotlinx.serialization.decodeFromString
@@ -94,6 +99,8 @@ fun Product.toWishlistEntity(): WishlistItemEntity {
     )
 }
 
+
+
 fun WishlistItemEntity.toDomain(): WishListItem {
     return WishListItem(
         productId = productId,
@@ -101,6 +108,17 @@ fun WishlistItemEntity.toDomain(): WishListItem {
         price = price,
         thumbnail = thumbnail,
         addedAt = addedAt
+    )
+}
+
+
+fun CartItem.toOrderItem(): OrderItem {
+    return OrderItem(
+        productId = productId,
+        title = title,
+        price = price,
+        thumbnail = thumbnail,
+        quantity = quantity
     )
 }
 
@@ -147,5 +165,52 @@ fun WishListItem.toCartItemEntity(): CartItemEntity {
         thumbnail = thumbnail,
         quantity = 1, /*Insert the cart item with default quantity of 1*/
         addedAt = System.currentTimeMillis()
+    )
+}
+
+fun OrderEntity.toDomain(): Order {
+    return Order(
+        id = id,
+        userId = userId,
+        totalPrice = totalPrice,
+        status = OrderStatus.valueOf(status.ifEmpty { "PENDING" }),
+        createdAt = createdAt,
+        paymobOrderId = paymobOrderId,    // ← add
+        paymentMethod = paymentMethod,     // ← add
+        items = emptyList()
+    )
+}
+
+fun Order.toOrderEntity(): OrderEntity {
+    return OrderEntity(
+        id = id,
+        userId = userId,
+        totalPrice = totalPrice,
+        status = status.name,
+        createdAt = createdAt,
+        paymobOrderId = paymobOrderId,
+        paymentMethod = paymentMethod,
+//        deliveryAddress = ""
+    )
+}
+
+fun OrderItemEntity.toDomain(): OrderItem {
+    return OrderItem(
+        productId = productId,
+        title = title,
+        price = price,
+        thumbnail = thumbnail,
+        quantity = quantity
+    )
+}
+
+fun OrderItem.toEntity(orderId: String): OrderItemEntity {
+    return OrderItemEntity(
+        orderId = orderId,
+        productId = productId,
+        title = title,
+        price = price,
+        thumbnail = thumbnail,
+        quantity = quantity
     )
 }
